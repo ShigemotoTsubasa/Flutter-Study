@@ -17,14 +17,27 @@ class MainApp extends StatelessWidget {
   }
 }
 
-class TodoHome extends StatelessWidget {
+class TodoHome extends StatefulWidget {
   const TodoHome({super.key});
+
+  @override
+  State<TodoHome> createState() => _TodoHomeState();
+}
+
+class _TodoHomeState extends State<TodoHome> {
+  List<String> todos = [];
+
+  void _addTodo(String todo) {
+    setState(() {
+      todos.add(todo);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Todo App")),
-      body: const TodoList(),
+      body: TodoList(todos: todos),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           print("ボタンが押されました");
@@ -32,7 +45,7 @@ class TodoHome extends StatelessWidget {
             context: context,
             builder: (BuildContext context) {
               print("ダイアログが表示されました");
-              return const AddTodoDialog();
+              return AddTodoDialog(onAddTodo: _addTodo);
             },
           );
         },
@@ -42,21 +55,35 @@ class TodoHome extends StatelessWidget {
   }
 }
 
-List<String> todos = [];
-
 class TodoList extends StatelessWidget {
-  const TodoList({super.key});
+  final List<String> todos;
+
+  const TodoList({super.key, required this.todos});
 
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: [for (var todo in todos) ListTile(title: Text(todo))],
+      children: [
+        for (var todo in todos)
+          ListTile(
+            title: Text(todo),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
+                IconButton(onPressed: () {}, icon: const Icon(Icons.delete)),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }
 
 class AddTodoDialog extends StatefulWidget {
-  const AddTodoDialog({super.key});
+  final Function(String) onAddTodo;
+
+  const AddTodoDialog({super.key, required this.onAddTodo});
 
   @override
   State<AddTodoDialog> createState() => _AddTodoDialogState();
@@ -74,10 +101,10 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text("Add Todo"),
+      title: const Text("Add Todo"),
       content: TextField(
         controller: _controller,
-        decoration: InputDecoration(hintText: "タイトル入力"),
+        decoration: const InputDecoration(hintText: "タイトル入力"),
       ),
       actions: [
         TextButton(
@@ -91,7 +118,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
             print("Todoが追加されました");
             print("Todoの内容: ${_controller.text}");
             if (_controller.text.isNotEmpty) {
-              todos.add(_controller.text);
+              widget.onAddTodo(_controller.text);
             }
             Navigator.of(context).pop();
           },
