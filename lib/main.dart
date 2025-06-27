@@ -43,7 +43,7 @@ class _CounterState extends State<Counter> {
               count++;
             });
           },
-          child: const Text('Increment'),
+          child: const Text('+1'),
         ),
       ],
     );
