@@ -27,6 +27,12 @@ class TodoHome extends StatefulWidget {
 class _TodoHomeState extends State<TodoHome> {
   List<String> todos = [];
 
+  void _onDeleteTodo(int index) {
+    setState(() {
+      todos.removeAt(index);
+    });
+  }
+
   void _addTodo(String todo) {
     setState(() {
       todos.add(todo);
@@ -37,7 +43,7 @@ class _TodoHomeState extends State<TodoHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Todo App")),
-      body: TodoList(todos: todos),
+      body: TodoList(todos: todos, onDeleteTodo: _onDeleteTodo),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           print("ボタンが押されました");
@@ -57,8 +63,9 @@ class _TodoHomeState extends State<TodoHome> {
 
 class TodoList extends StatelessWidget {
   final List<String> todos;
+  final Function(int) onDeleteTodo;
 
-  const TodoList({super.key, required this.todos});
+  const TodoList({super.key, required this.todos, required this.onDeleteTodo});
 
   @override
   Widget build(BuildContext context) {
@@ -70,8 +77,30 @@ class TodoList extends StatelessWidget {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton(onPressed: () {}, icon: const Icon(Icons.edit)),
-                IconButton(onPressed: () {}, icon: const Icon(Icons.delete)),
+                IconButton(
+                  onPressed: () {
+                    print("編集ボタンが押されました");
+                    // showDialog(
+                    //   context: context,
+                    //   builder: (BuildContext context) {
+                    //     print("編集ダイアログが表示されました");
+                    //     return EditTodoDialog(onEditTodo: (String newTodo) {
+                    //       // 編集処理をここに追加
+                    //       print("Todoが編集されました: $newTodo");
+                    //     });
+                    //   },
+                    // );
+                  },
+                  icon: const Icon(Icons.edit),
+                ),
+                IconButton(
+                  onPressed: () {
+                    print("削除ボタンが押されました。");
+                    onDeleteTodo(todos.indexOf(todo));
+                    print("Todoが削除されました: $todo");
+                  },
+                  icon: const Icon(Icons.delete),
+                ),
               ],
             ),
           ),
