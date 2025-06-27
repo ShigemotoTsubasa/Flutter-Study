@@ -10,7 +10,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Todo App',
+      title: 'Todo App1',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const TodoHome(),
     );
@@ -34,12 +34,33 @@ class _TodoHomeState extends State<TodoHome> {
   }
 
   void _addTodo(String todo) {
+    if (todos.contains(todo)) {
+      // 重複している場合はエラーメッセージを表示
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('同じタイトルのTodoが既に存在します'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
     setState(() {
       todos.add(todo);
     });
   }
 
   void _editTodo(int index, String newTodo) {
+    for (int i = 0; i < todos.length; i++) {
+      if (i != index && todos[i] == newTodo) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('同じタイトルのTodoが既に存在します'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+    }
     setState(() {
       todos[index] = newTodo;
     });
