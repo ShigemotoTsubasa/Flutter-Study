@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:first_app/WebViewPage.dart';
+import 'package:first_app/Page/WebViewPage.dart';
 
 void main() {
   test("[正常]ISBN13からISBN10に変換", () {

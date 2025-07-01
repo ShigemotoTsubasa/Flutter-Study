@@ -1,5 +1,5 @@
-import 'package:first_app/BarcodeReader.dart';
-import 'package:first_app/WebViewPage.dart';
+import 'package:first_app/Page/BarcodeReader.dart';
+import 'package:first_app/Page/WebViewPage.dart';
 import 'package:flutter/material.dart';
 
 void main() {
