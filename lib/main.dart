@@ -1,4 +1,5 @@
 import 'package:first_app/BarcodeReader.dart';
+import 'package:first_app/WebViewPage.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -22,16 +23,39 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String scannedValue = '';
+  List<String> barcodeList = [];
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('QRコードリーダー')),
-      body: Center(
-        child: Text(
-          scannedValue.isEmpty ? 'バーコードをスキャンしてください' : scannedValue,
-          style: const TextStyle(fontSize: 16),
+      body: Container(
+        child: ListView(
+          children: [
+            barcodeList.isEmpty
+                ? const Center(child: Text('バーコードをスキャンしてください'))
+                : Column(
+                    children: [
+                      for (var barcode in barcodeList)
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    WebViewPage(ISBN: barcode),
+                              ),
+                            );
+                          },
+                          child: Text(barcode),
+                        ),
+                    ],
+                  ),
+          ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -53,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
             );
             if (result != null) {
               setState(() {
-                scannedValue = result;
+                barcodeList.add(result as String);
               });
             }
           }
