@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  github: ^9.25.0
+  http: ^1.4.0
 
 dev_dependencies:
   flutter_test:
