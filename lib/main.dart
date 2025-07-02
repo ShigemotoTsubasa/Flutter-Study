@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(const CounterApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class CounterApp extends StatelessWidget {
+  const CounterApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,6 +14,7 @@ class MainApp extends StatelessWidget {
   }
 }
 
+//カウンター機能を持つStatefulWidget
 class Counter extends StatefulWidget {
   const Counter({super.key});
 
