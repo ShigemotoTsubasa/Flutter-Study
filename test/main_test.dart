@@ -15,7 +15,7 @@ void main() {
     expect(find.text('Count: 0'), findsOneWidget);
 
     // ボタンを押す
-    await tester.tap(find.byType(ElevatedButton));
+    await tester.tap(find.byKey(const Key('incrementButton')));
 
     // ウィジェットを再ビルドして状態を更新
     await tester.pump();

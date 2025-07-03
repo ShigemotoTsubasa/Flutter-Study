@@ -32,6 +32,7 @@ class _CounterState extends State<Counter> {
       children: [
         Text('Count: $count'),
         ElevatedButton(
+          key: const Key('incrementButton'),
           onPressed: () {
             setState(() {
               count++;
