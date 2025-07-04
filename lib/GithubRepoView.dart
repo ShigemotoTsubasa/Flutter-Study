@@ -1,7 +1,8 @@
-import 'package:first_app/github_response_json.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:search_github_repository/github_response_json.dart';
 
 class GithubRepoView extends StatelessWidget {
   final String searchRepo;

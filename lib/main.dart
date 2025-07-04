@@ -1,29 +1,29 @@
-import 'package:first_app/GithubRepoView.dart';
 import 'package:flutter/material.dart';
+import 'package:search_github_repository/GithubRepoView.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(const search_github_repository_app());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class search_github_repository_app extends StatelessWidget {
+  const search_github_repository_app({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: Scaffold(body: Center(child: SearchGithubRepo())),
+      home: Scaffold(body: Center(child: SearchInputPage())),
     );
   }
 }
 
-class SearchGithubRepo extends StatefulWidget {
-  const SearchGithubRepo({super.key});
+class SearchInputPage extends StatefulWidget {
+  const SearchInputPage({super.key});
 
   @override
-  _SearchGithubRepoState createState() => _SearchGithubRepoState();
+  _SearchInputPageState createState() => _SearchInputPageState();
 }
 
-class _SearchGithubRepoState extends State<SearchGithubRepo> {
+class _SearchInputPageState extends State<SearchInputPage> {
   final TextEditingController _controller = TextEditingController();
   String? searchRepo;
   @override
