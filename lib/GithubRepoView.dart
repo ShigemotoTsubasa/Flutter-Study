@@ -1,3 +1,4 @@
+import 'package:first_app/github_response_json.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -25,7 +26,7 @@ class SearchGithubRepo extends StatefulWidget {
 }
 
 class _SearchGithubRepoState extends State<SearchGithubRepo> {
-  Map<String, dynamic>? repoData;
+  GitHubSearchResponse? searchResponse;
   bool isLoading = true;
   String? error;
 
@@ -50,24 +51,21 @@ class _SearchGithubRepoState extends State<SearchGithubRepo> {
           headers: {'Accept': 'application/vnd.github.v3+json'},
         );
 
-        // ステータスコードを確認
         print('Status Code: ${response.statusCode}');
-        print('Response Headers: ${response.headers}');
-        print('Response Body: ${response.body}');
 
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
+          final gitHubResponse = GitHubSearchResponse.fromJson(data);
           setState(() {
-            repoData = data;
+            searchResponse = gitHubResponse;
             isLoading = false;
           });
-          print('取得成功: ${data['full_name']}');
+          print('取得成功: ${gitHubResponse.totalCount} 件のリポジトリが見つかりました');
         } else {
           setState(() {
             error = 'エラー: ${response.statusCode}';
             isLoading = false;
           });
-          print('エラー: ${response.statusCode} - ${response.body}');
         }
       } catch (e) {
         setState(() {
@@ -87,10 +85,8 @@ class _SearchGithubRepoState extends State<SearchGithubRepo> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ローディング状態の表示
             if (isLoading) const Center(child: CircularProgressIndicator()),
 
-            // エラー状態の表示
             if (error != null)
               Center(
                 child: Column(
@@ -104,88 +100,103 @@ class _SearchGithubRepoState extends State<SearchGithubRepo> {
                 ),
               ),
 
-            // データが取得できた場合の表示
-            if (repoData != null)
-              for (var i = 0; i < repoData!['items'].length; i++)
-                SizedBox(
-                  height: 230,
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        top: 35,
-                        left: 20,
-                        // elevationを付けるためMaterialウィジェットを使用
-                        child: Material(
-                          elevation: 4,
-                          child: Container(
-                            height: 180,
-                            width: MediaQuery.of(context).size.width * 0.9,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(0.0),
-                            ),
-                          ),
-                        ),
-                      ),
-                      // 画像部分
-                      Positioned(
-                        top: 0,
-                        left: 30,
-                        child: Card(
-                          elevation: 4,
-                          shadowColor: Colors.grey.withOpacity(0.5),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: Container(
-                            height: 200,
-                            width: 150,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              image: DecorationImage(
-                                image: NetworkImage(
-                                  '${repoData!['items'][i]['owner']['avatar_url']}', // 画像URLを取得
-                                ),
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 45,
-                        left: 200,
-                        child: SizedBox(
-                          height: 150,
-                          width: 180,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // タイトル
-                              Text(
-                                '${repoData!['items'][i]['name']}', // リポジトリ名を取得
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 22,
-                                ),
-                              ),
-                              Divider(color: Colors.black),
-                              // 説明文
-                              Text(
-                                '${repoData!['items'][i]['description'] ?? '説明がありません。'}', // 説明文を取得
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+            if (searchResponse != null)
+              Column(
+                children: [
+                  Text(
+                    '検索結果: ${searchResponse!.totalCount}件',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                ),
+                  SizedBox(height: 16),
+                  ...searchResponse!.items
+                      .map((repository) => _buildRepositoryCard(repository))
+                      .toList(),
+                ],
+              ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildRepositoryCard(Repository repository) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 20),
+      height: 230,
+      child: Stack(
+        children: [
+          Positioned(
+            top: 35,
+            left: 20,
+            child: Material(
+              elevation: 4,
+              child: Container(
+                height: 180,
+                width: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(0.0),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 0,
+            left: 30,
+            child: Card(
+              elevation: 4,
+              shadowColor: Colors.grey.withOpacity(0.5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Container(
+                height: 200,
+                width: 150,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  image: DecorationImage(
+                    image: NetworkImage(repository.owner.avatarUrl),
+                    fit: BoxFit.fill,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 45,
+            left: 200,
+            child: SizedBox(
+              height: 150,
+              width: 180,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    repository.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 22,
+                    ),
+                  ),
+                  Divider(color: Colors.black),
+                  Text(
+                    repository.description ?? '説明がありません。',
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(Icons.star, size: 16, color: Colors.orange),
+                      Text(' ${repository.stargazersCount}'),
+                      SizedBox(width: 10),
+                      Icon(Icons.code, size: 16),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
