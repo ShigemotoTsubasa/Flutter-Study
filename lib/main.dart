@@ -8,8 +8,9 @@ class CounterApp extends StatelessWidget {
   const CounterApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(body: Center(child: const Counter())),
+    return const MaterialApp(
+      title: "カウンターアプリ",
+      home: Scaffold(body: Center(child: Counter())),
     );
   }
 }
