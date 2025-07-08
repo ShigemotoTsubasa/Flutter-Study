@@ -3,11 +3,11 @@ import 'package:first_app/Dialog/editTodoDialog.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(const TodoApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class TodoApp extends StatelessWidget {
+  const TodoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
