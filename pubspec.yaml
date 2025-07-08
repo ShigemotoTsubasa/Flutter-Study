@@ -1,4 +1,4 @@
-name: first_app
+name: news_app
 description: "A new Flutter project."
 publish_to: 'none'
 version: 0.1.0
@@ -9,11 +9,18 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_dotenv: ^5.2.1
+  http: ^1.4.0
+  json_annotation: ^4.9.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  json_serializable: ^6.9.5
+  build_runner: ^2.4.7
 
 flutter:
   uses-material-design: true
+  assets: 
+    - .mise.toml
