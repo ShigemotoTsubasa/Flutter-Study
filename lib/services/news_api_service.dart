@@ -7,6 +7,7 @@ import 'dart:convert';
 class NewsApiService {
   final String apiKey = dotenv.get('NEWS_API_KEY');
   final String apiUrl = dotenv.get('NEWS_API_URL');
+  String searchValue = '日本';
 
   // 初期化チェックを実行
   NewsApiService() {
@@ -22,10 +23,10 @@ class NewsApiService {
     }
   }
 
-  Future<List<NewsData>> fetchNews() async {
+  Future<List<NewsData>> fetchNews({required String searchValue}) async {
     // getメソッドでデータを取得する
     final response = await http.get(
-      Uri.parse('$apiUrl/everything?q=日本&apiKey=$apiKey'),
+      Uri.parse('$apiUrl/everything?q=${searchValue}&apiKey=$apiKey'),
     );
 
     if (response.statusCode == 200) {

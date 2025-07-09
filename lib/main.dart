@@ -3,24 +3,39 @@ import 'package:news_app/screen/favorite_screen.dart';
 import 'package:news_app/screen/news_screen.dart';
 import 'package:news_app/screen/search_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:news_app/services/favorite_service.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: '.mise.toml');
+  await FavoriteService().initialize();
   runApp(const NewsApp());
 }
 
 class NewsApp extends StatefulWidget {
-  const NewsApp({super.key});
+  final String? searchValue;
+  const NewsApp({super.key, this.searchValue});
 
   @override
   State<NewsApp> createState() => _NewsAppState();
 }
 
 class _NewsAppState extends State<NewsApp> {
+  String? searchValue;
   int _currentIndex = 0; // 現在のページインデックス
 
   // ページリスト
-  final List<Widget> _pages = [NewsScreen(), SearchScreen(), FavoriteScreen()];
+  late List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+    searchValue = widget.searchValue;
+    _pages = [
+      NewsScreen(searchValue: searchValue),
+      SearchScreen(),
+      FavoriteScreen(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {

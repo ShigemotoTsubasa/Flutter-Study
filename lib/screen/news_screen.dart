@@ -5,7 +5,8 @@ import 'package:news_app/screen/news_detail_screen.dart';
 import 'package:news_app/services/news_api_service.dart';
 
 class NewsScreen extends StatefulWidget {
-  const NewsScreen({super.key});
+  final String? searchValue;
+  const NewsScreen({super.key, this.searchValue});
 
   @override
   State<NewsScreen> createState() => _NewsScreenState();
@@ -16,6 +17,7 @@ class _NewsScreenState extends State<NewsScreen> {
   List<NewsData> _newsList = [];
   bool _isLoading = true;
   String? _error;
+  String? searchValue;
 
   @override
   void initState() {
@@ -30,7 +32,9 @@ class _NewsScreenState extends State<NewsScreen> {
         _error = null;
       });
 
-      final newsList = await _newsApiService.fetchNews();
+      final newsList = await _newsApiService.fetchNews(
+        searchValue: widget.searchValue ?? '日本',
+      );
 
       setState(() {
         _newsList = newsList;
@@ -42,6 +46,10 @@ class _NewsScreenState extends State<NewsScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _refresh() async {
+    await _loadNews();
   }
 
   @override
@@ -66,102 +74,105 @@ class _NewsScreenState extends State<NewsScreen> {
         ),
       );
     }
-    return ListView.builder(
-      padding: const EdgeInsets.all(16.0),
-      itemCount: _newsList.length,
-      itemBuilder: (context, index) {
-        final newsItem = _newsList[index];
-        return GestureDetector(
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => NewsDetailScreen(newsData: newsItem),
+    return RefreshIndicator(
+      onRefresh: _refresh,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16.0),
+        itemCount: _newsList.length,
+        itemBuilder: (context, index) {
+          final newsItem = _newsList[index];
+          return GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => NewsDetailScreen(newsData: newsItem),
+                ),
+              );
+              print('ニュースアイテムがタップされました: ${newsItem.title}');
+            },
+            child: SizedBox(
+              height: 230,
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: 35,
+                    left: 20,
+                    child: Material(
+                      elevation: 4,
+                      child: Container(
+                        height: 180,
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(0.0),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // 画像部分
+                  Positioned(
+                    top: 0,
+                    left: 30,
+                    child: Card(
+                      elevation: 4,
+                      shadowColor: Colors.grey.withOpacity(0.5),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Container(
+                        height: 200,
+                        width: 150,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          image: DecorationImage(
+                            image: NetworkImage(
+                              newsItem.urlToImage ??
+                                  'https://via.placeholder.com/150', // 画像がない場合のプレースホルダー
+                            ),
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 45,
+                    left: 200,
+                    child: SizedBox(
+                      height: 150,
+                      width: 180,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // タイトル
+                          Text(
+                            newsItem.title,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 22,
+                            ),
+                          ),
+                          const Divider(color: Colors.black),
+                          // 説明文
+                          Text(
+                            newsItem.description ?? '説明がありません',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 3,
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            );
-            print('ニュースアイテムがタップされました: ${newsItem.title}');
-          },
-          child: SizedBox(
-            height: 230,
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 35,
-                  left: 20,
-                  child: Material(
-                    elevation: 4,
-                    child: Container(
-                      height: 180,
-                      width: MediaQuery.of(context).size.width * 0.9,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(0.0),
-                      ),
-                    ),
-                  ),
-                ),
-                // 画像部分
-                Positioned(
-                  top: 0,
-                  left: 30,
-                  child: Card(
-                    elevation: 4,
-                    shadowColor: Colors.grey.withOpacity(0.5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Container(
-                      height: 200,
-                      width: 150,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        image: DecorationImage(
-                          image: NetworkImage(
-                            newsItem.urlToImage ??
-                                'https://via.placeholder.com/150', // 画像がない場合のプレースホルダー
-                          ),
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 45,
-                  left: 200,
-                  child: SizedBox(
-                    height: 150,
-                    width: 180,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // タイトル
-                        Text(
-                          newsItem.title,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 22,
-                          ),
-                        ),
-                        const Divider(color: Colors.black),
-                        // 説明文
-                        Text(
-                          newsItem.description ?? '説明がありません',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 3,
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

@@ -31,6 +31,7 @@ class FavoriteNewsData {
       url: newsData.url,
       description: newsData.description,
       urlToImage: newsData.urlToImage,
+      content: newsData.content,
     );
   }
 }

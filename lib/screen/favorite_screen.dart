@@ -24,7 +24,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   void _loadFavorites() async {
     final favorites = await FavoriteService().getFavorites();
     setState(() {
-      _favorites = favorites.cast<FavoriteNewsData>();
+      _favorites = favorites;
       _isLoading = false;
     });
   }
@@ -66,6 +66,21 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => NewsDetailScreen(
+                    newsData: NewsData(
+                      title: newsItem.title,
+                      description: newsItem.description,
+                      urlToImage: newsItem.urlToImage,
+                      url: newsItem.url,
+                      content: newsItem.content,
+                    ),
+                  ),
+                ),
+              );
+            },
           ),
         );
       },
