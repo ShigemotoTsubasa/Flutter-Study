@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/models/api_data_models.dart';
+import 'package:news_app/models/favorite_data_models.dart';
+import 'package:news_app/services/favorite_service.dart';
 
 class NewsDetailScreen extends StatefulWidget {
   final NewsData newsData;
@@ -11,6 +13,39 @@ class NewsDetailScreen extends StatefulWidget {
 }
 
 class _NewsDetailScreenState extends State<NewsDetailScreen> {
+  final FavoriteService _favoriteService = FavoriteService();
+  bool _isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkFavoriteStatus();
+  }
+
+  void _checkFavoriteStatus() {
+    setState(() {
+      _isFavorite = _favoriteService.isFavorite(widget.newsData.url);
+    });
+  }
+
+  void _toggleFavorite() async {
+    final favoriteData = FavoriteNewsData.fromNewsData(widget.newsData);
+
+    if (_isFavorite) {
+      await _favoriteService.removeFavorite(favoriteData);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('お気に入りから削除しました')));
+    } else {
+      await _favoriteService.addFavorite(favoriteData);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('お気に入りに追加しました')));
+    }
+
+    _checkFavoriteStatus();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,10 +99,11 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
                       ),
                       alignment: Alignment.centerRight,
                       child: IconButton(
-                        onPressed: () {
-                          debugPrint("お気に入り");
-                        },
-                        icon: const Icon(Icons.favorite_border),
+                        onPressed: _toggleFavorite,
+                        color: _isFavorite ? Colors.red : Colors.grey,
+                        icon: _isFavorite
+                            ? const Icon(Icons.favorite)
+                            : const Icon(Icons.favorite_border),
                       ),
                     ),
                     // 説明文
