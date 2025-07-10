@@ -7,7 +7,8 @@ import 'dart:convert';
 class NewsApiService {
   final String apiKey = dotenv.get('NEWS_API_KEY');
   final String apiUrl = dotenv.get('NEWS_API_URL');
-  String searchValue = '日本';
+  String searchValue = '';
+  String categoryValue = '';
 
   // 初期化チェックを実行
   NewsApiService() {
@@ -23,22 +24,37 @@ class NewsApiService {
     }
   }
 
-  Future<List<NewsData>> fetchNews({required String searchValue}) async {
+  Future<List<NewsData>> fetchNews({
+    required String searchValue,
+    required String categoryValue,
+  }) async {
+    Uri uri;
     // getメソッドでデータを取得する
-    final response = await http.get(
-      Uri.parse('$apiUrl/everything?q=${searchValue}&apiKey=$apiKey'),
-    );
-
-    if (response.statusCode == 200) {
-      // JSONのデータを元のデータに戻す
-      final jsonData = jsonDecode(response.body);
-      // mapメソッドで、Map型のデータをListに変換する
-      final List<dynamic> articlesJson = jsonData['articles'];
-      return articlesJson
-          .map((articleJson) => NewsData.fromJson(articleJson))
-          .toList();
+    if (categoryValue.isEmpty && searchValue.isEmpty) {
+      uri = Uri.parse('$apiUrl/everything?q=日本&apiKey=$apiKey');
+    } else if (categoryValue.isEmpty) {
+      uri = Uri.parse('$apiUrl/everything?q=${searchValue}&apiKey=$apiKey');
     } else {
-      throw Exception('Failed to load news');
+      uri = Uri.parse(
+        '$apiUrl/top-headlines?category=${categoryValue}&apiKey=$apiKey',
+      );
+    }
+    try {
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        // JSONのデータを元のデータに戻す
+        final jsonData = jsonDecode(response.body);
+        // mapメソッドで、Map型のデータをListに変換する
+        final List<dynamic> articlesJson = jsonData['articles'];
+        return articlesJson
+            .map((articleJson) => NewsData.fromJson(articleJson))
+            .toList();
+      } else {
+        throw Exception('Failed to load news');
+      }
+    } catch (e) {
+      throw Exception('Failed to load news: $e');
     }
   }
 }

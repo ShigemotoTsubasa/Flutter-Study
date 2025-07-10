@@ -6,7 +6,8 @@ import 'package:news_app/services/news_api_service.dart';
 
 class NewsScreen extends StatefulWidget {
   final String? searchValue;
-  const NewsScreen({super.key, this.searchValue});
+  final String? categoryValue;
+  const NewsScreen({super.key, this.searchValue, this.categoryValue});
 
   @override
   State<NewsScreen> createState() => _NewsScreenState();
@@ -18,6 +19,7 @@ class _NewsScreenState extends State<NewsScreen> {
   bool _isLoading = true;
   String? _error;
   String? searchValue;
+  String? categoryValue;
 
   @override
   void initState() {
@@ -33,7 +35,8 @@ class _NewsScreenState extends State<NewsScreen> {
       });
 
       final newsList = await _newsApiService.fetchNews(
-        searchValue: widget.searchValue ?? '日本',
+        searchValue: widget.searchValue ?? '',
+        categoryValue: widget.categoryValue ?? '',
       );
 
       setState(() {

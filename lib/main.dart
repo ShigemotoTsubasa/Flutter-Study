@@ -13,7 +13,8 @@ Future<void> main() async {
 
 class NewsApp extends StatefulWidget {
   final String? searchValue;
-  const NewsApp({super.key, this.searchValue});
+  final String? categoryValue;
+  const NewsApp({super.key, this.searchValue, this.categoryValue});
 
   @override
   State<NewsApp> createState() => _NewsAppState();
@@ -21,7 +22,8 @@ class NewsApp extends StatefulWidget {
 
 class _NewsAppState extends State<NewsApp> {
   String? searchValue;
-  int _currentIndex = 0; // 現在のページインデックス
+  String? categoryValue;
+  int _currentIndex = 0;
 
   // ページリスト
   late List<Widget> _pages;
@@ -30,8 +32,9 @@ class _NewsAppState extends State<NewsApp> {
   void initState() {
     super.initState();
     searchValue = widget.searchValue;
+    categoryValue = widget.categoryValue;
     _pages = [
-      NewsScreen(searchValue: searchValue),
+      NewsScreen(searchValue: searchValue, categoryValue: categoryValue),
       SearchScreen(),
       FavoriteScreen(),
     ];
