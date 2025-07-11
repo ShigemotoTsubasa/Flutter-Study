@@ -35,28 +35,25 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(title: const Text('QRコードリーダー')),
       body: Container(
-        child: ListView(
-          children: [
-            barcodeList.isEmpty
-                ? const Center(child: Text('バーコードをスキャンしてください'))
-                : Column(
-                    children: [
-                      for (var barcode in barcodeList)
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    WebViewPage(ISBN: barcode),
-                              ),
-                            );
-                          },
-                          child: Text(barcode),
+        child: barcodeList.isEmpty
+            ? const Center(child: Text('バーコードをスキャンしてください'))
+            : ListView.builder(
+                itemCount: barcodeList.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(barcodeList[index]),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              WebViewPage(ISBN: barcodeList[index]),
                         ),
-                    ],
-                  ),
-          ],
-        ),
+                      );
+                    },
+                  );
+                },
+              ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [

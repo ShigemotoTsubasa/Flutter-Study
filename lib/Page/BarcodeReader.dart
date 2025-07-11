@@ -65,11 +65,11 @@ class _BarcodeReaderPageState extends State<BarcodeReaderPage> {
               ),
             ),
             Text(
-              scannedValue == '' ? 'QR コードをスキャンしてください。' : 'QRコードを検知しました。',
+              scannedValue.isEmpty ? 'QR コードをスキャンしてください。' : 'QRコードを検知しました。',
               style: const TextStyle(fontSize: 15),
             ),
             // QR コードの値を表示
-            Text(scannedValue == '' ? "" : "value: $scannedValue"),
+            Text(scannedValue.isEmpty ? "" : "value: $scannedValue"),
           ],
         ),
       ),
