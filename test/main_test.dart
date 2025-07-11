@@ -23,4 +23,13 @@ void main() {
     // ボタンを押した後にCountが1になっていることを確認
     expect(find.text('Count: 1'), findsOneWidget);
   });
+
+  testWidgets("[正常]+1ボタンを2回押すとCountが2になるテスト", (WidgetTester tester) async {
+    await tester.pumpWidget(const CounterApp());
+    expect(find.text('Count: 0'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('incrementButton')));
+    await tester.tap(find.byKey(const Key('incrementButton')));
+    await tester.pump();
+    expect(find.text('Count: 2'), findsOneWidget);
+  });
 }
