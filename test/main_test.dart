@@ -24,12 +24,13 @@ void main() {
     expect(find.text('Count: 1'), findsOneWidget);
   });
 
-  testWidgets("[正常]+1ボタンを2回押すとCountが2になるテスト", (WidgetTester tester) async {
+  testWidgets("[正常]+1ボタンを5回押すとCountが5になるテスト", (WidgetTester tester) async {
     await tester.pumpWidget(const CounterApp());
     expect(find.text('Count: 0'), findsOneWidget);
-    await tester.tap(find.byKey(const Key('incrementButton')));
-    await tester.tap(find.byKey(const Key('incrementButton')));
-    await tester.pump();
-    expect(find.text('Count: 2'), findsOneWidget);
+    for (int i = 0; i < 5; i++) {
+      await tester.tap(find.byKey(const Key('incrementButton')));
+      await tester.pump();
+      expect(find.text('Count: ${i + 1}'), findsOneWidget);
+    }
   });
 }
