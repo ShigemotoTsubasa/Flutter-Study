@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 
 class FavoriteService {
   static const String _fileName = 'favorites.json';
+  List<VoidCallback> _listeners = [];
   List<FavoriteNewsData> _favorites = [];
 
   // シングルトンパターン
@@ -17,6 +18,20 @@ class FavoriteService {
   // 初期化（アプリ起動時に呼び出す）
   Future<void> initialize() async {
     await _loadFavorites();
+  }
+
+  addListener(VoidCallback listener) {
+    _listeners.add(listener);
+  }
+
+  removeListener(VoidCallback listener) {
+    _listeners.remove(listener);
+  }
+
+  void _notifyListeners() {
+    for (var listener in _listeners) {
+      listener();
+    }
   }
 
   // お気に入りを追加
@@ -78,6 +93,7 @@ class FavoriteService {
       debugPrint("お気に入り読み込みエラー: $e");
       _favorites = [];
     }
+    _notifyListeners();
   }
 
   // JSONファイルにお気に入りを保存

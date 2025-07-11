@@ -42,7 +42,6 @@ class _NewsDetailScreenState extends State<NewsDetailScreen> {
         context,
       ).showSnackBar(const SnackBar(content: Text('お気に入りに追加しました')));
     }
-
     _checkFavoriteStatus();
   }
 
