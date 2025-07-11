@@ -1,5 +1,7 @@
+import 'dart:developer';
 import 'package:first_app/Dialog/addTodoDialog.dart';
 import 'package:first_app/Dialog/editTodoDialog.dart';
+import 'package:first_app/Dialog/notification_manager.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -38,12 +40,7 @@ class _TodoHomeState extends State<TodoHome> {
   void _addTodo(String todo) {
     if (todos.contains(todo)) {
       // 重複している場合はエラーメッセージを表示
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('同じタイトルのTodoが既に存在します'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      NotificationManager().showError("同じタイトルのTodoが既に存在します", context);
       return;
     }
     setState(() {
@@ -54,12 +51,7 @@ class _TodoHomeState extends State<TodoHome> {
   void _editTodo(int index, String newTodo) {
     for (int i = 0; i < todos.length; i++) {
       if (i != index && todos[i] == newTodo) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('同じタイトルのTodoが既に存在します'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        NotificationManager().showError("同じタイトルのTodoが既に存在します", context);
         return;
       }
     }
@@ -79,11 +71,11 @@ class _TodoHomeState extends State<TodoHome> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          print("ボタンが押されました");
+          log("ボタンが押されました");
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              print("ダイアログが表示されました");
+              log("ダイアログが表示されました");
               return AddTodoDialog(onAddTodo: _addTodo);
             },
           );
@@ -108,21 +100,22 @@ class TodoList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        for (var todo in todos)
-          ListTile(
+    return ListView.builder(
+      itemCount: todos.length,
+      itemBuilder: (context, index) {
+        for (var todo in todos) {
+          return ListTile(
             title: Text(todo),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
                   onPressed: () {
-                    print("編集ボタンが押されました");
+                    log("編集ボタンが押されました");
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
-                        print("編集ダイアログが表示されました");
+                        log("編集ダイアログが表示されました");
                         return EditTodoDialog(
                           index: todos.indexOf(todo),
                           currentTodo: todo,
@@ -135,16 +128,17 @@ class TodoList extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () {
-                    print("削除ボタンが押されました。");
+                    log("削除ボタンが押されました。");
                     onDeleteTodo(todos.indexOf(todo));
-                    print("Todoが削除されました: $todo");
+                    log("Todoが削除されました: $todo");
                   },
                   icon: const Icon(Icons.delete),
                 ),
               ],
             ),
-          ),
-      ],
+          );
+        }
+      },
     );
   }
 }

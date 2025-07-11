@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:first_app/Dialog/notification_manager.dart';
 import 'package:flutter/material.dart';
 
 class EditTodoDialog extends StatefulWidget {
@@ -46,12 +49,14 @@ class _EditTodoDialogState extends State<EditTodoDialog> {
         ),
         ElevatedButton(
           onPressed: () {
-            print("Todoが変更されました");
-            print("Todoの内容: ${_controller.text}");
-            if (_controller.text.isNotEmpty) {
-              widget.onEditTodo(widget.index, _controller.text);
+            log("Todoが変更されました");
+            log("Todoの内容: ${_controller.text}");
+            if (_controller.text.trim().isNotEmpty) {
+              widget.onEditTodo(widget.index, _controller.text.trim());
+              Navigator.of(context).pop();
+            } else {
+              NotificationManager().showError("Todoの内容を入力してください", context);
             }
-            Navigator.of(context).pop();
           },
           child: const Text("変更"),
         ),
