@@ -45,8 +45,9 @@ String convertISBN(String isbn13) {
 class WebViewBody extends StatelessWidget {
   final String ISBN;
 
+  const WebViewBody({Key? key, required this.ISBN}) : super(key: key);
+
   @override
-  WebViewBody({Key? key, required this.ISBN}) : super(key: key);
   Widget build(BuildContext context) {
     final WebViewController controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
