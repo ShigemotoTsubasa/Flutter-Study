@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/models/api_data_models.dart';
 import 'package:news_app/models/favorite_data_models.dart';
-import 'package:news_app/services/favorite_service.dart';
 import 'package:news_app/screen/news_detail_screen.dart';
+import 'package:news_app/services/favorite_service.dart';
 
 class FavoriteScreen extends StatefulWidget {
   const FavoriteScreen({super.key});
@@ -12,28 +12,44 @@ class FavoriteScreen extends StatefulWidget {
 }
 
 class _FavoriteScreenState extends State<FavoriteScreen> {
+  final FavoriteService _favoriteService = FavoriteService();
   List<FavoriteNewsData> _favorites = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    // サービスからの変更を監視するためにリスナーを登録
+    _favoriteService.addListener(_onFavoritesChanged);
+    // 初回のデータを読み込む
     _loadFavorites();
   }
 
-  void _loadFavorites() async {
-    final favorites = await FavoriteService().getFavorites();
+  @override
+  void dispose() {
+    // ウィジェットが破棄される際にリスナーを解除
+    _favoriteService.removeListener(_onFavoritesChanged);
+    super.dispose();
+  }
+
+  // お気に入りの状態が変更されたときに呼び出されるコールバック
+  void _onFavoritesChanged() {
+    // サービスから最新のデータを取得してUIを更新
+    if (mounted) {
+      _loadFavorites();
+    }
+  }
+
+  void _loadFavorites() {
     setState(() {
-      _favorites = favorites;
+      _favorites = _favoriteService.getFavorites();
       _isLoading = false;
     });
   }
 
   Future<void> _refreshFavorites() async {
-    setState(() {
-      _isLoading = true;
-    });
-    _loadFavorites();
+    // ファイルから強制的に再読み込み
+    await _favoriteService.initialize();
   }
 
   @override
@@ -76,6 +92,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                 overflow: TextOverflow.ellipsis,
               ),
               onTap: () {
+                // 詳細画面に遷移するだけ。戻ってきたときの更新はリスナーが自動で行う。
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => NewsDetailScreen(

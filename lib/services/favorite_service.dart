@@ -106,6 +106,7 @@ class FavoriteService {
     } catch (e) {
       debugPrint("お気に入り保存エラー: $e");
     }
+    _notifyListeners();
   }
 
   // ローカルファイルを取得
