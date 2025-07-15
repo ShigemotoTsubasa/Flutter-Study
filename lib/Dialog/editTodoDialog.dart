@@ -49,10 +49,10 @@ class _EditTodoDialogState extends State<EditTodoDialog> {
         ),
         ElevatedButton(
           onPressed: () {
-            log("Todoが変更されました");
-            log("Todoの内容: ${_controller.text}");
             if (_controller.text.trim().isNotEmpty) {
               widget.onEditTodo(widget.index, _controller.text.trim());
+              log("Todoが変更されました");
+              log("Todoの内容: ${_controller.text}");
               Navigator.of(context).pop();
             } else {
               NotificationManager().showError("Todoの内容を入力してください", context);

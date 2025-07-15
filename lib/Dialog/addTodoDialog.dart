@@ -37,10 +37,10 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
         ),
         ElevatedButton(
           onPressed: () {
-            log("Todoが追加されました");
-            log("Todoの内容: ${_controller.text}");
             if (_controller.text.trim().isNotEmpty) {
               widget.onAddTodo(_controller.text.trim());
+              log("Todoが追加されました");
+              log("Todoの内容: ${_controller.text}");
               Navigator.of(context).pop();
             } else {
               NotificationManager().showError("Todoの内容を入力してください", context);
