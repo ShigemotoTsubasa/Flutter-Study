@@ -1,4 +1,4 @@
-name: first_app
+name: search_github_repository
 description: "A new Flutter project."
 publish_to: 'none'
 version: 0.1.0
@@ -9,11 +9,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  github: ^9.25.0
+  http: ^1.4.0
+  json_annotation: ^4.8.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  build_runner: ^2.4.7
+  json_serializable: ^6.7.1
 
 flutter:
   uses-material-design: true
