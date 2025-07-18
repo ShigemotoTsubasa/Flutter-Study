@@ -109,14 +109,14 @@ class _SearchGithubRepoState extends State<SearchGithubRepo> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 16),
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: searchResponse!.items.length,
-                      itemBuilder: (context, index) {
-                        final repository = searchResponse!.items[index];
-                        return _buildRepositoryCard(repository);
-                      },
-                    ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: searchResponse!.items.length,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      final repository = searchResponse!.items[index];
+                      return _buildRepositoryCard(repository);
+                    },
                   ),
                 ],
               ),
