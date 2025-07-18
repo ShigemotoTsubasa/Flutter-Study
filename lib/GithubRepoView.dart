@@ -52,7 +52,7 @@ class _SearchGithubRepoState extends State<SearchGithubRepo> {
           headers: {'Accept': 'application/vnd.github.v3+json'},
         );
 
-        print('Status Code: ${response.statusCode}');
+        debugPrint('Status Code: ${response.statusCode}');
 
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
@@ -61,7 +61,7 @@ class _SearchGithubRepoState extends State<SearchGithubRepo> {
             searchResponse = gitHubResponse;
             isLoading = false;
           });
-          print('取得成功: ${gitHubResponse.totalCount} 件のリポジトリが見つかりました');
+          debugPrint('取得成功: ${gitHubResponse.totalCount} 件のリポジトリが見つかりました');
         } else {
           setState(() {
             error = 'エラー: ${response.statusCode}';
@@ -73,7 +73,7 @@ class _SearchGithubRepoState extends State<SearchGithubRepo> {
           error = 'ネットワークエラー: $e';
           isLoading = false;
         });
-        print('例外エラー: $e');
+        debugPrint('例外エラー: $e');
       }
     }
   }
@@ -109,9 +109,15 @@ class _SearchGithubRepoState extends State<SearchGithubRepo> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 16),
-                  ...searchResponse!.items
-                      .map((repository) => _buildRepositoryCard(repository))
-                      .toList(),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: searchResponse!.items.length,
+                      itemBuilder: (context, index) {
+                        final repository = searchResponse!.items[index];
+                        return _buildRepositoryCard(repository);
+                      },
+                    ),
+                  ),
                 ],
               ),
           ],

@@ -34,44 +34,42 @@ class _SearchInputPageState extends State<SearchInputPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextField(
-                controller: _controller,
-                decoration: InputDecoration(
-                  labelText: 'リポジトリ名',
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    searchRepo = value.isEmpty ? null : value;
-                  });
-                },
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              controller: _controller,
+              decoration: InputDecoration(
+                labelText: 'リポジトリ名',
+                border: OutlineInputBorder(),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  if (searchRepo != null && searchRepo!.isNotEmpty) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            GithubRepoView(searchRepo: searchRepo!),
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('リポジトリ名が空です。入力してください')),
-                    );
-                  }
-                },
-                child: const Text('検索'),
-              ),
-            ],
-          ),
+              onChanged: (value) {
+                setState(() {
+                  searchRepo = value.isEmpty ? null : value;
+                });
+              },
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (searchRepo != null && searchRepo!.isNotEmpty) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          GithubRepoView(searchRepo: searchRepo!),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('リポジトリ名が空です。入力してください')),
+                  );
+                }
+              },
+              child: const Text('検索'),
+            ),
+          ],
         ),
       ),
     );
