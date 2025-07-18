@@ -91,7 +91,7 @@ class _NewsScreenState extends State<NewsScreen> {
                   builder: (context) => NewsDetailScreen(newsData: newsItem),
                 ),
               );
-              print('ニュースアイテムがタップされました: ${newsItem.title}');
+              debugPrint('ニュースアイテムがタップされました: ${newsItem.title}');
             },
             child: SizedBox(
               height: 230,

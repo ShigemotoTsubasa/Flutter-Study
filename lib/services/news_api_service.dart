@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:json_annotation/json_annotation.dart';
@@ -19,7 +20,7 @@ class NewsApiService {
     if (apiKey.isEmpty) {
       throw Exception("APIとの接続に失敗しました。");
     } else {
-      print('APIキー: $apiKey');
+      debugPrint('APIキー: $apiKey');
       // ここでニュースを取得する処理を追加
     }
   }
