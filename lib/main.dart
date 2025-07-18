@@ -49,11 +49,11 @@ class _TodoHomeState extends State<TodoHome> {
   }
 
   void _editTodo(int index, String newTodo) {
-    for (int i = 0; i < todos.length; i++) {
-      if (i != index && todos[i] == newTodo) {
-        NotificationManager().showError("同じタイトルのTodoが既に存在します", context);
-        return;
-      }
+    if (todos.asMap().entries.any(
+      (entry) => entry.key != index && entry.value == newTodo,
+    )) {
+      NotificationManager().showError("同じタイトルのTodoが既に存在します", context);
+      return;
     }
     setState(() {
       todos[index] = newTodo;
@@ -103,41 +103,40 @@ class TodoList extends StatelessWidget {
     return ListView.builder(
       itemCount: todos.length,
       itemBuilder: (context, index) {
-        for (var todo in todos) {
-          return ListTile(
-            title: Text(todo),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    log("編集ボタンが押されました");
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        log("編集ダイアログが表示されました");
-                        return EditTodoDialog(
-                          index: todos.indexOf(todo),
-                          currentTodo: todo,
-                          onEditTodo: onEditTodo,
-                        );
-                      },
-                    );
-                  },
-                  icon: const Icon(Icons.edit),
-                ),
-                IconButton(
-                  onPressed: () {
-                    log("削除ボタンが押されました。");
-                    onDeleteTodo(todos.indexOf(todo));
-                    log("Todoが削除されました: $todo");
-                  },
-                  icon: const Icon(Icons.delete),
-                ),
-              ],
-            ),
-          );
-        }
+        final todo = todos[index];
+        return ListTile(
+          title: Text(todo),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                onPressed: () {
+                  log("編集ボタンが押されました");
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      log("編集ダイアログが表示されました");
+                      return EditTodoDialog(
+                        index: todos.indexOf(todo),
+                        currentTodo: todo,
+                        onEditTodo: onEditTodo,
+                      );
+                    },
+                  );
+                },
+                icon: const Icon(Icons.edit),
+              ),
+              IconButton(
+                onPressed: () {
+                  log("削除ボタンが押されました。");
+                  onDeleteTodo(todos.indexOf(todo));
+                  log("Todoが削除されました: $todo");
+                },
+                icon: const Icon(Icons.delete),
+              ),
+            ],
+          ),
+        );
       },
     );
   }
