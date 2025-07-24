@@ -10,8 +10,10 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_dotenv: ^5.2.1
+  flutter_riverpod: ^2.6.1
   http: ^1.4.0
   json_annotation: ^4.9.0
+  riverpod_generator: ^2.6.5
 
 dev_dependencies:
   flutter_test:

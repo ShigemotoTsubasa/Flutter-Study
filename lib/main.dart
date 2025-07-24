@@ -1,4 +1,5 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:news_app/screen/favorite_screen.dart';
 import 'package:news_app/screen/news_screen.dart';
 import 'package:news_app/screen/search_screen.dart';
@@ -7,8 +8,7 @@ import 'package:news_app/services/favorite_service.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: '.mise.toml');
-  await FavoriteService().initialize();
-  runApp(const NewsApp());
+  runApp(const ProviderScope(child: NewsApp()));
 }
 
 class NewsApp extends StatefulWidget {
