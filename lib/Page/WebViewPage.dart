@@ -42,18 +42,37 @@ String convertISBN(String isbn13) {
   return isbn10Base + checkChar;
 }
 
-class WebViewBody extends StatelessWidget {
+class WebViewBody extends StatefulWidget {
   final String ISBN;
 
   const WebViewBody({Key? key, required this.ISBN}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final WebViewController controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(
-        Uri.parse('https://www.amazon.co.jp/dp/${convertISBN(ISBN)}'),
+  _WebViewBodyState createState() => _WebViewBodyState();
+}
+
+class _WebViewBodyState extends State<WebViewBody> {
+  late WebViewController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      _controller = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..loadRequest(
+          Uri.parse('https://www.amazon.co.jp/dp/${convertISBN(widget.ISBN)}'),
+        );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("ページの読み込みに失敗しました。ISBNコードが正しいか確認してください")),
       );
-    return WebViewWidget(controller: controller);
+      debugPrint("Error initializing WebView: $e");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WebViewWidget(controller: _controller);
   }
 }
