@@ -55,7 +55,7 @@ class _EditTodoDialogState extends State<EditTodoDialog> {
               log("Todoの内容: ${_controller.text}");
               Navigator.of(context).pop();
             } else {
-              NotificationManager().showError("Todoの内容を入力してください", context);
+              NotificationManager.showError("Todoの内容を入力してください", context);
             }
           },
           child: const Text("変更"),

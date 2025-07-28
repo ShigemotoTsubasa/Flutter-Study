@@ -43,7 +43,7 @@ class _AddTodoDialogState extends State<AddTodoDialog> {
               log("Todoの内容: ${_controller.text}");
               Navigator.of(context).pop();
             } else {
-              NotificationManager().showError("Todoの内容を入力してください", context);
+              NotificationManager.showError("Todoの内容を入力してください", context);
             }
           },
           child: const Text("追加"),

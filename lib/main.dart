@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:first_app/Dialog/addTodoDialog.dart';
 import 'package:first_app/Dialog/editTodoDialog.dart';
 import 'package:first_app/Dialog/notification_manager.dart';
@@ -40,7 +39,7 @@ class _TodoHomeState extends State<TodoHome> {
   void _addTodo(String todo) {
     if (todos.contains(todo)) {
       // 重複している場合はエラーメッセージを表示
-      NotificationManager().showError("同じタイトルのTodoが既に存在します", context);
+      NotificationManager.showError("同じタイトルのTodoが既に存在します", context);
       return;
     }
     setState(() {
@@ -52,7 +51,7 @@ class _TodoHomeState extends State<TodoHome> {
     if (todos.asMap().entries.any(
       (entry) => entry.key != index && entry.value == newTodo,
     )) {
-      NotificationManager().showError("同じタイトルのTodoが既に存在します", context);
+      NotificationManager.showError("同じタイトルのTodoが既に存在します", context);
       return;
     }
     setState(() {
@@ -71,11 +70,11 @@ class _TodoHomeState extends State<TodoHome> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          log("ボタンが押されました");
+          debugPrint("ボタンが押されました");
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              log("ダイアログが表示されました");
+              debugPrint("ダイアログが表示されました");
               return AddTodoDialog(onAddTodo: _addTodo);
             },
           );
@@ -111,13 +110,13 @@ class TodoList extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: () {
-                  log("編集ボタンが押されました");
+                  debugPrint("編集ボタンが押されました");
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      log("編集ダイアログが表示されました");
+                      debugPrint("編集ダイアログが表示されました");
                       return EditTodoDialog(
-                        index: todos.indexOf(todo),
+                        index: index,
                         currentTodo: todo,
                         onEditTodo: onEditTodo,
                       );
@@ -128,9 +127,9 @@ class TodoList extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () {
-                  log("削除ボタンが押されました。");
-                  onDeleteTodo(todos.indexOf(todo));
-                  log("Todoが削除されました: $todo");
+                  debugPrint("削除ボタンが押されました。");
+                  onDeleteTodo(index);
+                  debugPrint("Todoが削除されました: $todo");
                 },
                 icon: const Icon(Icons.delete),
               ),
