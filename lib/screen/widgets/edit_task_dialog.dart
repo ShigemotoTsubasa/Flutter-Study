@@ -5,21 +5,35 @@ import 'package:first_app/services/task_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AddTaskDialog extends ConsumerStatefulWidget {
-  const AddTaskDialog({super.key});
+class EditTaskDialog extends ConsumerStatefulWidget {
+  const EditTaskDialog({super.key, required this.task});
+
+  final TaskModels task;
 
   @override
-  ConsumerState<AddTaskDialog> createState() => _AddTaskDialogState();
+  ConsumerState<EditTaskDialog> createState() => _EditTaskDialogState();
 }
 
-class _AddTaskDialogState extends ConsumerState<AddTaskDialog> {
-  final taskNameController = TextEditingController();
-  final taskDescriptionController = TextEditingController();
-  var selectedTaskCategory = 0;
+class _EditTaskDialogState extends ConsumerState<EditTaskDialog> {
+  late DateTime startAt;
+  late DateTime endAt;
+  late final TextEditingController taskNameController;
+  late final TextEditingController taskDescriptionController;
+  late int selectedTaskCategory;
 
-  // 日時選択のための変数を追加
-  DateTime startAt = DateTime.now();
-  DateTime endAt = DateTime.now().add(const Duration(days: 1));
+  @override
+  void initState() {
+    super.initState();
+
+    // 編集対象のタスクの値で各フィールドを初期化
+    taskNameController = TextEditingController(text: widget.task.taskName);
+    taskDescriptionController = TextEditingController(
+      text: widget.task.taskDescription,
+    );
+    startAt = widget.task.startAt;
+    endAt = widget.task.endAt;
+    selectedTaskCategory = widget.task.categoryId;
+  }
 
   @override
   void dispose() {
@@ -56,16 +70,13 @@ class _AddTaskDialogState extends ConsumerState<AddTaskDialog> {
 
           if (isStartDate) {
             startAt = newDateTime;
-            // 開始日時が終了日時より後の場合、終了日時を調整
             if (startAt.isAfter(endAt)) {
               endAt = startAt.add(const Duration(hours: 1));
             }
           } else {
-            // 終了日時が開始日時より前の場合は設定しない
             if (newDateTime.isAfter(startAt)) {
               endAt = newDateTime;
             } else {
-              // エラーメッセージを表示
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('終了日時は開始日時より後に設定してください')),
               );
@@ -86,7 +97,7 @@ class _AddTaskDialogState extends ConsumerState<AddTaskDialog> {
     final taskCategories = ref.watch(taskCategoriesServiceProvider);
 
     return AlertDialog(
-      title: const Text('タスクを追加'),
+      title: const Text('タスク編集'),
       content: SingleChildScrollView(
         // スクロール可能にする
         child: Column(
@@ -98,16 +109,16 @@ class _AddTaskDialogState extends ConsumerState<AddTaskDialog> {
             ),
             const SizedBox(height: 16),
             TextField(
-              decoration: const InputDecoration(labelText: 'タスクの詳細'),
+              decoration: const InputDecoration(labelText: 'タスク詳細'),
               controller: taskDescriptionController,
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField(
-              value: selectedTaskCategory == 0 ? null : selectedTaskCategory,
+            DropdownButtonFormField<int>(
+              value: selectedTaskCategory,
               items: taskCategories.when(
                 data: (categories) {
                   return categories.map((category) {
-                    return DropdownMenuItem(
+                    return DropdownMenuItem<int>(
                       value: category.categoryId,
                       child: Text(category.categoryName),
                     );
@@ -122,7 +133,7 @@ class _AddTaskDialogState extends ConsumerState<AddTaskDialog> {
               ),
               onChanged: (value) {
                 setState(() {
-                  selectedTaskCategory = value ?? 0;
+                  selectedTaskCategory = value ?? selectedTaskCategory;
                 });
               },
               decoration: const InputDecoration(labelText: 'カテゴリを選択'),
@@ -154,47 +165,43 @@ class _AddTaskDialogState extends ConsumerState<AddTaskDialog> {
           },
           child: const Text('キャンセル'),
         ),
-        ElevatedButton(
+        TextButton(
           onPressed: () async {
-            // バリデーション
-            if (taskNameController.text.isEmpty) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('タスク名を入力してください')));
-              return;
-            }
+            // 既存の通知をキャンセル
+            final notificationService = ref.read(notificationServiceProvider);
+            await notificationService.cancelTaskNotifications(
+              widget.task.taskId,
+            );
 
-            if (selectedTaskCategory == 0) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('カテゴリを選択してください')));
-              return;
-            }
+            // タスクを更新
+            ref
+                .read(taskServiceProvider.notifier)
+                .editTask(
+                  taskId: widget.task.taskId,
+                  taskName: taskNameController.text,
+                  taskDescription: taskDescriptionController.text,
+                  startAt: startAt, // 選択された日時を使用
+                  endAt: endAt, // 選択された日時を使用
+                  categoryId: selectedTaskCategory,
+                );
 
-            final newTask = TaskModels(
+            // 更新されたタスクで通知をスケジュール
+            final updatedTask = TaskModels(
               categoryId: selectedTaskCategory,
-              taskId: DateTime.now().toIso8601String(),
+              taskId: widget.task.taskId,
               taskName: taskNameController.text,
               taskDescription: taskDescriptionController.text,
               startAt: startAt,
               endAt: endAt,
-              isCompleted: false,
+              isCompleted: widget.task.isCompleted,
             );
-
-            // タスクを追加
-            ref.read(taskServiceProvider.notifier).addTask(newTask);
-
-            // 通知をスケジュール
-            final notificationService = ref.read(notificationServiceProvider);
-            await notificationService.scheduleTaskNotifications(newTask);
-
-            debugPrint("追加タスク保存ボタンが押されました。");
+            await notificationService.scheduleTaskNotifications(updatedTask);
 
             if (mounted) {
               Navigator.of(context).pop();
             }
           },
-          child: const Text('追加'),
+          child: const Text('保存'),
         ),
       ],
     );

@@ -1,14 +1,19 @@
+import 'package:first_app/screen/completed_task_screen.dart';
 import 'package:first_app/screen/setting_screen.dart';
 import 'package:first_app/screen/task_screen.dart';
-import 'package:first_app/screen/widgets/add_task_dialog.dart';
-// import 'package:first_app/screen/widgets/task_tabs.dart'; // この行は不要になる可能性があります
+import 'package:first_app/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // 選択中のタブのインデックスを管理するProvider
 final bottomNavIndexProvider = StateProvider((ref) => 0);
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 通知サービスを初期化
+  await NotificationService.initialize();
+
   runApp(const ProviderScope(child: TaskApp()));
 }
 
@@ -23,10 +28,9 @@ class TaskApp extends ConsumerWidget {
     final currentIndex = ref.watch(bottomNavIndexProvider);
 
     // 各タブに対応する画面のリスト
-    // TODO: 完了画面を実際のウィジェットに置き換えてください
     final screens = [
       const TaskScreen(),
-      const Center(child: Text('完了タスク画面')), // 仮の完了画面
+      const CompletedTaskScreen(),
       const SettingScreen(),
     ];
 

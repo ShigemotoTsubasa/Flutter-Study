@@ -1,4 +1,5 @@
 import 'package:first_app/models/task_categories_models.dart';
+import 'package:first_app/services/notification_service.dart';
 import 'package:first_app/services/task_categories_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,6 +38,7 @@ class SettingScreen extends ConsumerWidget {
                                       taskCategoriesServiceProvider.notifier,
                                     )
                                     .deleteTaskCategory(category.categoryId);
+                                debugPrint("カテゴリ削除ボタンがクリックされました。");
                               },
                             ),
                           );
@@ -58,13 +60,66 @@ class SettingScreen extends ConsumerWidget {
               ),
             ],
           ),
-          ListTile(
-            title: const Text('設定項目2'),
-            onTap: () {
-              // 設定項目2の処理
-            },
+
+          // 通知テスト機能を追加
+          ExpansionTile(
+            title: const Text('通知設定'),
+            children: [
+              ListTile(
+                title: const Text('テスト通知を送信'),
+                subtitle: const Text('通知が正常に動作するかテストします'),
+                trailing: ElevatedButton(
+                  onPressed: () async {
+                    final notificationService = ref.read(
+                      notificationServiceProvider,
+                    );
+                    await notificationService.showNotification(
+                      id: 999,
+                      title: 'テスト通知',
+                      body: '通知が正常に動作しています！',
+                    );
+
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('テスト通知を送信しました')),
+                      );
+                    }
+                  },
+                  child: const Text('送信'),
+                ),
+              ),
+              ListTile(
+                title: const Text('保留中の通知を確認'),
+                subtitle: const Text('スケジュールされた通知の数を確認します'),
+                trailing: ElevatedButton(
+                  onPressed: () async {
+                    final notificationService = ref.read(
+                      notificationServiceProvider,
+                    );
+                    final pending = await notificationService
+                        .getPendingNotifications();
+
+                    if (context.mounted) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('保留中の通知'),
+                          content: Text('${pending.length}件の通知がスケジュールされています'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('確認'),
+                ),
+              ),
+            ],
           ),
-          // 他の設定項目を追加
         ],
       ),
     );
@@ -94,8 +149,7 @@ class SettingScreen extends ConsumerWidget {
                 if (value.isNotEmpty) {
                   final newCategory = TaskCategory(
                     categoryName: value,
-                    categoryId: DateTime.now().millisecondsSinceEpoch
-                        .toString(),
+                    categoryId: DateTime.now().millisecondsSinceEpoch,
                   );
                   ref
                       .read(taskCategoriesServiceProvider.notifier)

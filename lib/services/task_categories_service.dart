@@ -30,21 +30,14 @@ class TaskCategoriesService extends _$TaskCategoriesService {
   }
 
   Future<void> addTaskCategory(TaskCategory taskCategory) async {
-    // 現在のstateからリストを取得します。nullの場合は空のリストを使います。
     final currentCategories = state.value ?? [];
-    // 新しいカテゴリを追加した新しいリストを作成します。
     final newCategories = [...currentCategories, taskCategory];
 
-    // UIを楽観的に更新するため、先にstateを更新します。
     state = AsyncValue.data(newCategories);
-
-    // その後、非同期でファイルに保存します。
     try {
       await _saveTaskCategories(newCategories);
     } catch (e, s) {
-      // もし保存に失敗した場合は、エラー状態として通知します。
       state = AsyncValue.error(e, s);
-      // 必要であれば、UIを元の状態に戻す処理もここに追加できます。
     }
   }
 
@@ -52,16 +45,22 @@ class TaskCategoriesService extends _$TaskCategoriesService {
     try {
       final file = await _getLocalFile(_fileName);
       final jsonData = categories.map((cat) => cat.toJson()).toList();
+      debugPrint("カテゴリ保存: ${jsonEncode(jsonData)}");
       await file.writeAsString(jsonEncode(jsonData));
     } catch (e) {
       debugPrint("お気に入り保存エラー: $e");
     }
   }
 
-  Future<void> deleteTaskCategory(String categoryId) async {
+  Future<void> deleteTaskCategory(int categoryId) async {
     final categories = await _loadTaskCategories();
     categories.removeWhere((cat) => cat.categoryId == categoryId);
-    await _saveTaskCategories(categories);
+    state = AsyncValue.data(categories);
+    try {
+      await _saveTaskCategories(categories);
+    } catch (e, s) {
+      state = AsyncValue.error(e, s);
+    }
   }
 
   Future<File> _getLocalFile(String fileName) async {

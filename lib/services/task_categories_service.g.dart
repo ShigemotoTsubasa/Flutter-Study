@@ -7,7 +7,7 @@ part of 'task_categories_service.dart';
 // **************************************************************************
 
 String _$taskCategoriesServiceHash() =>
-    r'b72116b06547447f9a71c205479dc30dd9cbbfab';
+    r'd758c6f3f9747d76e0c37f4aea7a05716f0f2d58';
 
 /// See also [TaskCategoriesService].
 @ProviderFor(TaskCategoriesService)

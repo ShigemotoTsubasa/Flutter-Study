@@ -8,7 +8,7 @@ part of 'task_categories_models.dart';
 
 TaskCategory _$TaskCategoryFromJson(Map<String, dynamic> json) => TaskCategory(
   categoryName: json['categoryName'] as String,
-  categoryId: json['categoryId'] as String,
+  categoryId: (json['categoryId'] as num).toInt(),
 );
 
 Map<String, dynamic> _$TaskCategoryToJson(TaskCategory instance) =>

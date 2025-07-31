@@ -1,26 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'task_service.dart';
+part of 'selected_task_category_service.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$taskServiceHash() => r'55f3eb95ffadae2ffad9e308f165b4157308ae66';
+String _$selectedTaskCategoryServiceHash() =>
+    r'6df62bcca1e484d9f27f958db98ae78c545ddd80';
 
-/// See also [TaskService].
-@ProviderFor(TaskService)
-final taskServiceProvider =
-    AutoDisposeAsyncNotifierProvider<TaskService, List<TaskModels>>.internal(
-      TaskService.new,
-      name: r'taskServiceProvider',
+/// See also [SelectedTaskCategoryService].
+@ProviderFor(SelectedTaskCategoryService)
+final selectedTaskCategoryServiceProvider =
+    AutoDisposeNotifierProvider<SelectedTaskCategoryService, int>.internal(
+      SelectedTaskCategoryService.new,
+      name: r'selectedTaskCategoryServiceProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
           ? null
-          : _$taskServiceHash,
+          : _$selectedTaskCategoryServiceHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );
 
-typedef _$TaskService = AutoDisposeAsyncNotifier<List<TaskModels>>;
+typedef _$SelectedTaskCategoryService = AutoDisposeNotifier<int>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

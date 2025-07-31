@@ -31,13 +31,28 @@ class TaskService extends _$TaskService {
     return [];
   }
 
+  List<TaskModels> getTasks(int selectedCategory, bool isCompleted) {
+    final tasks = state.value ?? [];
+    if (selectedCategory == 0) {
+      return tasks.where((task) => task.isCompleted == isCompleted).toList();
+    }
+    debugPrint("選択されたカテゴリ: $selectedCategory");
+    debugPrint("タスク: ${tasks.map((task) => task.toJson()).toList()}");
+    return tasks
+        .where(
+          (task) =>
+              task.categoryId == selectedCategory &&
+              task.isCompleted == isCompleted,
+        )
+        .toList();
+  }
+
   Future<void> addTask(TaskModels task) async {
     final currentTasks = state.value ?? [];
 
     final newTasks = [...currentTasks, task];
 
     state = AsyncValue.data(newTasks);
-
     try {
       await _saveTasks(newTasks);
     } catch (e, s) {
@@ -45,10 +60,94 @@ class TaskService extends _$TaskService {
     }
   }
 
+  Future<void> editTask({
+    required String taskId,
+    required String taskName,
+    required String taskDescription,
+    required DateTime endAt,
+    required DateTime startAt,
+    required int categoryId,
+  }) async {
+    final currentTasks = state.value ?? [];
+    final taskIndex = currentTasks.indexWhere((task) => task.taskId == taskId);
+
+    if (taskIndex == -1) {
+      debugPrint("タスクが見つかりません: $taskId");
+      return;
+    }
+
+    final updatedTask = TaskModels(
+      taskId: taskId,
+      taskName: taskName,
+      taskDescription: taskDescription,
+      startAt: startAt,
+      endAt: endAt,
+      categoryId: categoryId,
+      isCompleted: false,
+    );
+
+    final newTasks = List<TaskModels>.from(currentTasks);
+    newTasks[taskIndex] = updatedTask;
+
+    state = AsyncValue.data(newTasks);
+    try {
+      await _saveTasks(newTasks);
+    } catch (e, s) {
+      state = AsyncValue.error(e, s);
+    }
+    debugPrint("タスクが更新されました: ${updatedTask.toJson()}");
+  }
+
+  Future<void> deleteTask(String taskId) async {
+    final currentTasks = state.value ?? [];
+    final newTasks = currentTasks
+        .where((task) => task.taskId != taskId)
+        .toList();
+
+    state = AsyncValue.data(newTasks);
+    try {
+      await _saveTasks(newTasks);
+    } catch (e, s) {
+      state = AsyncValue.error(e, s);
+    }
+  }
+
+  Future<void> toggleTaskCompletion(String taskId, bool isComplated) async {
+    final currentTasks = state.value ?? [];
+    final taskIndex = currentTasks.indexWhere((task) => task.taskId == taskId);
+
+    if (taskIndex == -1) {
+      debugPrint("タスクが見つかりません: $taskId");
+      return;
+    }
+
+    final updatedTask = TaskModels(
+      taskId: currentTasks[taskIndex].taskId,
+      taskName: currentTasks[taskIndex].taskName,
+      taskDescription: currentTasks[taskIndex].taskDescription,
+      startAt: currentTasks[taskIndex].startAt,
+      endAt: currentTasks[taskIndex].endAt,
+      categoryId: currentTasks[taskIndex].categoryId,
+      isCompleted: isComplated,
+    );
+
+    final newTasks = List<TaskModels>.from(currentTasks);
+    newTasks[taskIndex] = updatedTask;
+
+    state = AsyncValue.data(newTasks);
+    try {
+      await _saveTasks(newTasks);
+    } catch (e, s) {
+      state = AsyncValue.error(e, s);
+    }
+    debugPrint("タスクの完了状態を更新しました: ${updatedTask.toJson()}");
+  }
+
   Future<void> _saveTasks(List<TaskModels> tasks) async {
     try {
       final file = await _getLocalFile(_fileName);
       final jsonData = tasks.map((task) => task.toJson()).toList();
+      debugPrint("タスク保存: $jsonData");
       await file.writeAsString(jsonEncode(jsonData));
     } catch (e) {
       debugPrint("タスク保存エラー: $e");
