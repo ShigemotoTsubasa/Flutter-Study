@@ -1,4 +1,5 @@
 import 'package:first_app/models/task_categories_models.dart';
+import 'package:first_app/models/task_models.dart';
 import 'package:first_app/services/notification_service.dart';
 import 'package:first_app/services/task_categories_service.dart';
 import 'package:flutter/material.dart';
@@ -116,6 +117,40 @@ class SettingScreen extends ConsumerWidget {
                     }
                   },
                   child: const Text('確認'),
+                ),
+              ),
+              ListTile(
+                title: const Text('タスク通知テスト'),
+                subtitle: const Text('5秒後にタスク通知をスケジュールします'),
+                trailing: ElevatedButton(
+                  onPressed: () async {
+                    final notificationService = ref.read(
+                      notificationServiceProvider,
+                    );
+                    await notificationService
+                        .scheduleTestNotificationIn5Seconds();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('タスク通知をスケジュールしました')),
+                      );
+                    }
+                  },
+                  child: const Text('スケジュール'),
+                ),
+              ),
+              ListTile(
+                title: const Text('通知システム初期化'),
+                subtitle: const Text('通知システムを再初期化します'),
+                trailing: ElevatedButton(
+                  onPressed: () async {
+                    await NotificationService.initialize();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('通知システムを初期化しました')),
+                      );
+                    }
+                  },
+                  child: const Text('初期化'),
                 ),
               ),
             ],

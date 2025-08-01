@@ -1,7 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:first_app/models/task_models.dart';
 import 'dart:io' show Platform;
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   return NotificationService();
@@ -16,6 +19,8 @@ class NotificationService {
   // 通知の初期化
   static Future<void> initialize() async {
     if (_initialized) return;
+
+    tz.initializeTimeZones(); // タイムゾーンの初期化
 
     const androidSettings = AndroidInitializationSettings(
       '@mipmap/ic_launcher',
@@ -35,7 +40,7 @@ class NotificationService {
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         // 通知タップ時の処理
-        print('Notification tapped: ${response.payload}');
+        debugPrint('Notification tapped: ${response.payload}');
       },
     );
 
@@ -113,15 +118,29 @@ class NotificationService {
       iOS: iosDetails,
     );
 
+    final tz.TZDateTime scheduledTZ = tz.TZDateTime.from(
+      scheduledTime,
+      tz.local,
+    );
+
+    final now = tz.TZDateTime.now(tz.local);
+    debugPrint("現在の時刻: $now");
+
     // 現在時刻より未来の場合のみスケジュール
-    if (scheduledTime.isAfter(DateTime.now())) {
-      // 即座に通知を表示（デモ用）
-      await showNotification(
-        id: id,
-        title: title,
-        body: body,
+    if (scheduledTZ.isAfter(tz.TZDateTime.now(tz.local))) {
+      await _notifications.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledTZ,
+        notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         payload: payload,
       );
+
+      debugPrint('通知をスケジュールしました: $title at $scheduledTZ');
+    } else {
+      debugPrint('過去の時間のため通知をスケジュールしませんでした: $scheduledTime');
     }
   }
 
@@ -135,7 +154,7 @@ class NotificationService {
       id: taskIdHash, // 開始通知のID
       title: 'タスク開始',
       body: '「${task.taskName}」が開始されました',
-      scheduledTime: task.startAt,
+      scheduledTime: tz.TZDateTime.from(task.startAt, tz.local),
       payload: 'task_start_${task.taskId}',
     );
 
@@ -144,7 +163,7 @@ class NotificationService {
       id: taskIdHash + 1, // 終了通知のID
       title: 'タスク終了',
       body: '「${task.taskName}」が終了しました',
-      scheduledTime: task.endAt,
+      scheduledTime: tz.TZDateTime.from(task.endAt, tz.local),
       payload: 'task_end_${task.taskId}',
     );
   }
@@ -164,5 +183,37 @@ class NotificationService {
   // 保留中の通知を取得
   Future<List<PendingNotificationRequest>> getPendingNotifications() async {
     return await _notifications.pendingNotificationRequests();
+  }
+
+  //テスト用
+  Future<void> scheduleTestNotificationIn5Seconds() async {
+    final now = DateTime.now();
+    final fiveSecondsLater = now.add(const Duration(seconds: 5));
+
+    await scheduleNotification(
+      id: 99999,
+      title: 'テスト通知（5秒後）',
+      body: '5秒後の通知テストです',
+      scheduledTime: fiveSecondsLater,
+      payload: 'test_5sec',
+    );
+
+    debugPrint('5秒後の通知をスケジュールしました: $fiveSecondsLater');
+  }
+
+  // 1分後のテスト通知
+  Future<void> scheduleTestNotificationIn1Minute() async {
+    final now = DateTime.now();
+    final oneMinuteLater = now.add(const Duration(minutes: 1));
+
+    await scheduleNotification(
+      id: 99998,
+      title: 'テスト通知（1分後）',
+      body: '1分後の通知テストです',
+      scheduledTime: oneMinuteLater,
+      payload: 'test_1min',
+    );
+
+    debugPrint('1分後の通知をスケジュールしました: $oneMinuteLater');
   }
 }

@@ -1,4 +1,5 @@
 import 'package:first_app/models/task_models.dart';
+import 'package:first_app/services/notification_service.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
@@ -55,6 +56,8 @@ class TaskService extends _$TaskService {
     state = AsyncValue.data(newTasks);
     try {
       await _saveTasks(newTasks);
+      final notificationService = NotificationService();
+      await notificationService.scheduleTaskNotifications(task);
     } catch (e, s) {
       state = AsyncValue.error(e, s);
     }
@@ -92,6 +95,8 @@ class TaskService extends _$TaskService {
     state = AsyncValue.data(newTasks);
     try {
       await _saveTasks(newTasks);
+      final notificationService = NotificationService();
+      await notificationService.scheduleTaskNotifications(updatedTask);
     } catch (e, s) {
       state = AsyncValue.error(e, s);
     }
@@ -107,6 +112,8 @@ class TaskService extends _$TaskService {
     state = AsyncValue.data(newTasks);
     try {
       await _saveTasks(newTasks);
+      final notificationService = NotificationService();
+      await notificationService.cancelTaskNotifications(taskId);
     } catch (e, s) {
       state = AsyncValue.error(e, s);
     }
@@ -137,6 +144,8 @@ class TaskService extends _$TaskService {
     state = AsyncValue.data(newTasks);
     try {
       await _saveTasks(newTasks);
+      final notificationService = NotificationService();
+      await notificationService.cancelTaskNotifications(taskId);
     } catch (e, s) {
       state = AsyncValue.error(e, s);
     }
