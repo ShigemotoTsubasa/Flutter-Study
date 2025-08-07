@@ -4,16 +4,15 @@ import 'package:first_app/screen/task_screen.dart';
 import 'package:first_app/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart';
 
 // 選択中のタブのインデックスを管理するProvider
 final bottomNavIndexProvider = StateProvider((ref) => 0);
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // 通知サービスを初期化
+  tz.initializeTimeZones();
   await NotificationService.initialize();
-
   runApp(const ProviderScope(child: TaskApp()));
 }
 

@@ -1,5 +1,6 @@
 import 'package:first_app/screen/widgets/add_task_dialog.dart';
 import 'package:first_app/screen/widgets/edit_task_dialog.dart';
+import 'package:first_app/screen/widgets/task_detail_dialog.dart';
 import 'package:first_app/screen/widgets/task_tabs.dart';
 import 'package:first_app/services/notification_service.dart';
 import 'package:first_app/services/selected_task_category_service.dart';
@@ -65,22 +66,26 @@ class TaskScreen extends ConsumerWidget {
                             IconButton(
                               icon: const Icon(Icons.delete),
                               onPressed: () async {
-                                // 通知をキャンセル
-                                final notificationService = ref.read(
-                                  notificationServiceProvider,
-                                );
-                                await notificationService
-                                    .cancelTaskNotifications(task.taskId);
-
                                 // タスクを削除
                                 ref
                                     .read(taskServiceProvider.notifier)
                                     .deleteTask(task.taskId);
+
+                                ref
+                                    .read(notificationServiceProvider)
+                                    .cancelTaskNotifications(task.taskId);
                                 debugPrint("タスク削除ボタンがクリックされました。");
                               },
                             ),
                           ],
                         ),
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) =>
+                                TaskDetailDialog(taskId: task.taskId),
+                          );
+                        },
                       ),
                     );
                   },

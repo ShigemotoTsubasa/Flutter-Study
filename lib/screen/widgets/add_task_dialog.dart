@@ -185,9 +185,9 @@ class _AddTaskDialogState extends ConsumerState<AddTaskDialog> {
             ref.read(taskServiceProvider.notifier).addTask(newTask);
 
             // 通知をスケジュール
-            final notificationService = ref.read(notificationServiceProvider);
-            await notificationService.scheduleTaskNotifications(newTask);
-
+            await ref
+                .read(notificationServiceProvider)
+                .scheduleTaskNotifications(newTask);
             debugPrint("追加タスク保存ボタンが押されました。");
 
             if (mounted) {

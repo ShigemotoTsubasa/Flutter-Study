@@ -56,8 +56,6 @@ class TaskService extends _$TaskService {
     state = AsyncValue.data(newTasks);
     try {
       await _saveTasks(newTasks);
-      final notificationService = NotificationService();
-      await notificationService.scheduleTaskNotifications(task);
     } catch (e, s) {
       state = AsyncValue.error(e, s);
     }
@@ -95,8 +93,6 @@ class TaskService extends _$TaskService {
     state = AsyncValue.data(newTasks);
     try {
       await _saveTasks(newTasks);
-      final notificationService = NotificationService();
-      await notificationService.scheduleTaskNotifications(updatedTask);
     } catch (e, s) {
       state = AsyncValue.error(e, s);
     }
@@ -112,8 +108,6 @@ class TaskService extends _$TaskService {
     state = AsyncValue.data(newTasks);
     try {
       await _saveTasks(newTasks);
-      final notificationService = NotificationService();
-      await notificationService.cancelTaskNotifications(taskId);
     } catch (e, s) {
       state = AsyncValue.error(e, s);
     }
@@ -144,12 +138,28 @@ class TaskService extends _$TaskService {
     state = AsyncValue.data(newTasks);
     try {
       await _saveTasks(newTasks);
-      final notificationService = NotificationService();
-      await notificationService.cancelTaskNotifications(taskId);
     } catch (e, s) {
       state = AsyncValue.error(e, s);
     }
     debugPrint("タスクの完了状態を更新しました: ${updatedTask.toJson()}");
+  }
+
+  Future<TaskModels> getTasksByTaskId(String taskId) async {
+    final currentTasks = state.value ?? [];
+    final task = currentTasks.firstWhere(
+      (task) => task.taskId == taskId,
+      orElse: () => TaskModels(
+        taskId: '',
+        taskName: '',
+        taskDescription: '',
+        startAt: DateTime.now(),
+        endAt: DateTime.now(),
+        categoryId: 0,
+        isCompleted: false,
+      ),
+    );
+    debugPrint("タスク詳細取得: ${task.toJson()}");
+    return task;
   }
 
   Future<void> _saveTasks(List<TaskModels> tasks) async {

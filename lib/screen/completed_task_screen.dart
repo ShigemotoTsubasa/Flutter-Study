@@ -8,24 +8,29 @@ class CompletedTaskScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final completedTasks = ref
-        .watch(taskServiceProvider.notifier)
-        .getTasks(0, true);
+    final taskService = ref.watch(taskServiceProvider);
 
-    return Scaffold(
-      appBar: AppBar(title: const Text("完了タスク")),
-      body: ListView.builder(
-        itemCount: completedTasks.length,
-        itemBuilder: (context, index) {
-          final task = completedTasks[index];
-          return Card(
-            child: ListTile(
-              title: Text(task.taskName),
-              subtitle: Text(task.taskDescription),
-            ),
-          );
-        },
-      ),
+    return taskService.when(
+      data: (tasks) {
+        final completedTasks = tasks.where((task) => task.isCompleted).toList();
+        return Scaffold(
+          appBar: AppBar(title: const Text("完了タスク")),
+          body: ListView.builder(
+            itemCount: completedTasks.length,
+            itemBuilder: (context, index) {
+              final task = completedTasks[index];
+              return Card(
+                child: ListTile(
+                  title: Text(task.taskName),
+                  subtitle: Text(task.taskDescription),
+                ),
+              );
+            },
+          ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(child: Text('エラー: $error')),
     );
   }
 }
