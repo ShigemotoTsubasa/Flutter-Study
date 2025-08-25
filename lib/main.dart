@@ -27,19 +27,23 @@ class StopWatch extends StatefulWidget {
 }
 
 class _StopWatchState extends State<StopWatch> {
-  Duration duration = const Duration(seconds: 0);
+  Duration duration = Duration.zero;
   Timer? timer;
-  bool isRunning = false;
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
 
   void startTimer() {
-    if (isRunning) {
+    if (timer?.isActive ?? false) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("すでにタイマーが動いています。"), backgroundColor: Colors.red),
       );
       return;
     }
     setState(() {
-      isRunning = true;
       timer = Timer.periodic(const Duration(milliseconds: 10), (timer) {
         setState(() {
           duration += const Duration(milliseconds: 10);
@@ -51,9 +55,6 @@ class _StopWatchState extends State<StopWatch> {
   void stopTimer() {
     if (timer != null) {
       timer!.cancel();
-      setState(() {
-        isRunning = false;
-      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("タイマーは動いていません。"), backgroundColor: Colors.red),
@@ -62,23 +63,18 @@ class _StopWatchState extends State<StopWatch> {
   }
 
   void resetTimer() {
-    if (isRunning == false) {
-      setState(() {
-        duration = const Duration(
-          hours: 0,
-          minutes: 0,
-          seconds: 0,
-          milliseconds: 0,
-          microseconds: 0,
-        );
-      });
-    } else {
+    if (timer?.isActive ?? false) {
+      // エラーメッセージを表示する
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("タイマーが動いています。停止させてください"),
+          content: Text("リセットする前にタイマーを停止してください。"),
           backgroundColor: Colors.red,
         ),
       );
+    } else {
+      setState(() {
+        duration = Duration.zero;
+      });
     }
   }
 
