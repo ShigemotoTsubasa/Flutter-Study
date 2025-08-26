@@ -43,11 +43,9 @@ class _StopWatchState extends State<StopWatch> {
       );
       return;
     }
-    setState(() {
-      timer = Timer.periodic(const Duration(milliseconds: 10), (timer) {
-        setState(() {
-          duration += const Duration(milliseconds: 10);
-        });
+    timer = Timer.periodic(const Duration(milliseconds: 10), (timer) {
+      setState(() {
+        duration += const Duration(milliseconds: 10);
       });
     });
   }
@@ -80,35 +78,33 @@ class _StopWatchState extends State<StopWatch> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          Text(duration.toString(), style: TextStyle(fontSize: 48)),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  startTimer();
-                },
-                child: Text("Start"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  stopTimer();
-                },
-                child: Text("Stop"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  resetTimer();
-                },
-                child: Text("Reset"),
-              ),
-            ],
-          ),
-        ],
-      ),
+    return Column(
+      children: [
+        Text(duration.toString(), style: TextStyle(fontSize: 48)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                startTimer();
+              },
+              child: Text("Start"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                stopTimer();
+              },
+              child: Text("Stop"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                resetTimer();
+              },
+              child: Text("Reset"),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
