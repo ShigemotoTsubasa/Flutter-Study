@@ -37,7 +37,7 @@ class _StopWatchState extends State<StopWatch> {
   }
 
   void startTimer() {
-    if (timer?.isActive ?? false) {
+    if (timer!.isActive) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("すでにタイマーが動いています。"), backgroundColor: Colors.red),
       );
@@ -61,7 +61,7 @@ class _StopWatchState extends State<StopWatch> {
   }
 
   void resetTimer() {
-    if (timer?.isActive ?? false) {
+    if (timer!.isActive) {
       // エラーメッセージを表示する
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
