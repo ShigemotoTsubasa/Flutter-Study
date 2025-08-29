@@ -12,8 +12,8 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: Text("ストップウォッチ")),
-        body: Column(children: [StopWatch()]),
+        appBar: AppBar(title: const Text("ストップウォッチ")),
+        body: Column(children: [const StopWatch()]),
       ),
     );
   }
@@ -37,7 +37,7 @@ class _StopWatchState extends State<StopWatch> {
   }
 
   void startTimer() {
-    if (timer!.isActive) {
+    if (timer?.isActive ?? false) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("すでにタイマーが動いています。"), backgroundColor: Colors.red),
       );
@@ -61,7 +61,7 @@ class _StopWatchState extends State<StopWatch> {
   }
 
   void resetTimer() {
-    if (timer!.isActive) {
+    if (timer?.isActive ?? false) {
       // エラーメッセージを表示する
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -88,19 +88,19 @@ class _StopWatchState extends State<StopWatch> {
               onPressed: () {
                 startTimer();
               },
-              child: Text("Start"),
+              child: const Text("Start"),
             ),
             ElevatedButton(
               onPressed: () {
                 stopTimer();
               },
-              child: Text("Stop"),
+              child: const Text("Stop"),
             ),
             ElevatedButton(
               onPressed: () {
                 resetTimer();
               },
-              child: Text("Reset"),
+              child: const Text("Reset"),
             ),
           ],
         ),
